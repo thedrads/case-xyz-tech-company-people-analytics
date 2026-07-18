@@ -1,0 +1,44 @@
+name: Proposta de melhoria
+description: Sugira uma melhoria para análise, visualização, documentação ou estrutura do projeto.
+title: "[Melhoria]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problema ou oportunidade
+      description: Descreva a necessidade que motivou a proposta.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Solução proposta
+      description: Explique a mudança sugerida e o benefício esperado.
+    validations:
+      required: true
+  - type: textarea
+    id: validation
+    attributes:
+      label: Critérios de aceitação
+      description: Indique como verificar que a melhoria foi implementada corretamente.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Área principal
+      options:
+        - Notebook e código
+        - Indicadores e metodologia
+        - Visualizações
+        - Documentação
+        - Automação e qualidade
+        - Estrutura do repositório
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Confirmação
+      options:
+        - label: A proposta não inclui dados pessoais, credenciais ou informações confidenciais.
+          required: true
