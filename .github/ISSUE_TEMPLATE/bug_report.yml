@@ -1,0 +1,44 @@
+name: Relato de erro
+description: Informe um problema reproduzível no notebook, nos dados ou na documentação.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: Obrigado por ajudar a melhorar o projeto.
+  - type: textarea
+    id: description
+    attributes:
+      label: Descrição do problema
+      description: Explique o que ocorreu e qual resultado era esperado.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Passos para reprodução
+      placeholder: |
+        1. Abra...
+        2. Execute...
+        3. Observe...
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Ambiente
+      placeholder: Google Colab, Python 3.12, sistema operacional...
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidências
+      description: Inclua mensagens de erro, saídas ou screenshots sem dados sensíveis.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Confirmações
+      options:
+        - label: Executei o notebook desde o início em uma sessão limpa.
+          required: true
+        - label: Verifiquei que a issue não contém credenciais ou dados sensíveis.
+          required: true

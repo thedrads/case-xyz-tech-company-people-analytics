@@ -1,0 +1,110 @@
+name: Quality checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: quality-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate-project:
+    name: Validate data and execute notebook
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install project dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+          python -m pip install nbconvert
+
+      - name: Validate notebook structure
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import nbformat
+
+          notebook = Path("notebooks/case_xyz_tech_company_people_analytics.ipynb")
+          if not notebook.exists():
+              raise FileNotFoundError(f"Notebook ausente: {notebook}")
+
+          with notebook.open(encoding="utf-8") as file:
+              document = nbformat.read(file, as_version=4)
+
+          if not document.cells:
+              raise ValueError("O notebook não contém células.")
+
+          code_cells = [cell for cell in document.cells if cell.cell_type == "code"]
+          if not code_cells:
+              raise ValueError("O notebook não contém células de código.")
+
+          print(
+              f"Notebook válido: {len(document.cells)} células, "
+              f"sendo {len(code_cells)} de código."
+          )
+          PY
+
+      - name: Execute notebook from start to finish
+        run: |
+          jupyter nbconvert \
+            --to notebook \
+            --execute notebooks/case_xyz_tech_company_people_analytics.ipynb \
+            --output executed_case_xyz.ipynb \
+            --output-dir /tmp \
+            --ExecutePreprocessor.timeout=300
+
+      - name: Validate processed CSV
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import pandas as pd
+
+          csv_file = Path("data/processed/resultados_case_xyz_tech_company.csv")
+          if not csv_file.exists():
+              raise FileNotFoundError(f"Arquivo ausente: {csv_file}")
+
+          dataframe = pd.read_csv(csv_file, sep=";", decimal=",")
+
+          if dataframe.shape[0] != 3:
+              raise ValueError("O resumo deve conter exatamente três cargos.")
+
+          if dataframe.isna().any().any():
+              raise ValueError("O arquivo consolidado contém valores ausentes.")
+
+          expected_columns = {
+              "Cargo",
+              "Quantidade de vagas",
+              "Tempo médio de contratação (dias)",
+              "Vagas dentro do prazo",
+              "Vagas atrasadas",
+              "Percentual dentro do prazo (%)",
+              "Percentual de atraso (%)",
+              "Atraso médio das vagas atrasadas (dias)",
+          }
+
+          missing_columns = expected_columns.difference(dataframe.columns)
+          if missing_columns:
+              raise ValueError(
+                  "Colunas obrigatórias ausentes: "
+                  + ", ".join(sorted(missing_columns))
+              )
+
+          print("CSV validado com sucesso.")
+          PY
