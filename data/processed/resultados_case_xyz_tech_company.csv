@@ -1,0 +1,4 @@
+Cargo;Quantidade de vagas;Tempo médio de contratação (dias);Vagas dentro do prazo;Vagas atrasadas;Percentual dentro do prazo (%);Percentual de atraso (%);Atraso médio das vagas atrasadas (dias)
+Desenvolvedor Back-End;3;64,33;0;3;0,0;100,0;11,33
+Analista de Dados;3;85,0;2;1;66,67;33,33;2,0
+UX Designer;4;116,5;2;2;50,0;50,0;4,0
